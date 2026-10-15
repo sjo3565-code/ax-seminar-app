@@ -25,15 +25,15 @@ if mode=='관리자':
  try:rows,_=store.read()
  except Exception as e:st.error(str(e));st.stop()
  st.metric('전체 제출',str(len(rows))+' / 25건')
- st.caption('각 팀 5명 제출 시 집계 완료. 평균은 참고값이며 최종 집계·동점 기준은 운영자가 결정합니다.')
+ st.caption('관리자 화면에는 제출 현황만 표시합니다.')
  for i,p in enumerate(PEOPLE):
   subset=[x for x in rows if x['target']==i]
   with st.container(border=True):
    st.markdown('**'+p+' · '+TEAMS[i]+'**')
-   st.write(str(len(subset))+'/5명 제출 · 참고 평균 '+(format(sum(x['total'] for x in subset)/len(subset),'.2f') if subset else '-')+'점')
-   if len(subset)<5:st.caption('집계 미완료')
- with st.expander('항목별 제출 내역'):
-  st.dataframe([{'심사위원':x['name'],'소속':x['role'],'발표자':PEOPLE[x['target']],**{c[0]:x['scores'][i] for i,c in enumerate(CRITERIA)},'총점':x['total']} for x in rows],hide_index=True)
+   st.write('제출 '+str(len(subset))+' / 5명')
+   if len(subset)==5:st.caption('제출 완료')
+   elif subset:st.caption('제출 진행 중')
+   else:st.caption('제출 대기')
  st.download_button('CSV 내려받기',export_csv(rows),file_name='AX세미나_채점.csv',mime='text/csv',type='primary')
 else:
  if st.session_state.auth is None:
