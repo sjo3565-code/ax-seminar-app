@@ -3,6 +3,7 @@ from datetime import datetime,timezone
 import requests
 TEAMS=['중형압연팀','대형제강팀','봉형강압연설계팀','대형압연팀','중형제강팀']
 PEOPLE=['홍정원','이광원','최태호','신종열','김용진']
+JUDGE_NAMES={'실장': '윤혜성', '중형제강팀': '김진섭', '중형압연팀': '김태형', '대형제강팀': '구자덕', '대형압연팀': '전상규', '봉형강압연설계팀': '배병철'}
 CRITERIA=[('실용성',30),('난이도 대비 효과',40),('확산 가능성',20),('발표·전달력',10)]
 def validate(role,target,scores):
  if type(target)!=int or target not in range(5) or TEAMS[target]==role:raise ValueError('본인 팀은 채점할 수 없습니다.')
@@ -19,11 +20,13 @@ class Store:
   if res.status_code!=200:raise RuntimeError('저장소 조회 실패 (HTTP '+str(res.status_code)+'). 관리자에게 문의하세요.')
   obj=res.json();data=json.loads(base64.b64decode(obj['content']))
   if not isinstance(data,list):raise RuntimeError('점수 파일 형식 오류')
+  for row in data:
+   if row.get('role') in JUDGE_NAMES:row['name']=JUDGE_NAMES[row['role']]
   return data,obj['sha']
  def save(self,judge,name,target,scores):
   total=validate(judge['role'],target,scores)
   if not name.strip() or len(name)>30:raise ValueError('성명을 확인하세요.')
-  record={'judge':judge['id'],'name':name.strip(),'role':judge['role'],'target':target,'scores':scores,'total':total,'updated':datetime.now(timezone.utc).isoformat()}
+  record={'judge':judge['id'],'name':JUDGE_NAMES[judge['role']],'role':judge['role'],'target':target,'scores':scores,'total':total,'updated':datetime.now(timezone.utc).isoformat()}
   for attempt in range(7):
    rows,sha=self.read();rows=[x for x in rows if not(x['judge']==judge['id'] and x['target']==target)]+[record]
    payload={'message':'Update seminar score','branch':self.branch,'sha':sha,'content':base64.b64encode(json.dumps(rows,ensure_ascii=False).encode()).decode()}

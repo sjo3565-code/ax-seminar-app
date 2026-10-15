@@ -1,6 +1,6 @@
 import streamlit as st
 import hmac,html
-from core import Store,TEAMS,PEOPLE,CRITERIA,export_csv
+from core import Store,TEAMS,PEOPLE,CRITERIA,export_csv,JUDGE_NAMES
 st.set_page_config(page_title='형강생산실 AX 세미나',page_icon='📋',layout='centered')
 st.markdown("""<style>.stApp{background:#f2f5fa}.block-container{max-width:740px;padding-top:2rem} .hero{background:linear-gradient(120deg,#082b54,#655f9c 65%,#278a88);padding:26px;border-radius:20px;color:white;margin-bottom:20px}.hero h1{color:white;font-size:30px}.hero p{color:#d7eee9}.stButton button[kind=primary]{background:#167d76;border:0}div[data-testid=stMetric]{background:linear-gradient(135deg,#eef3fc,#e8f5ef);padding:16px;border-radius:12px}</style><div class="hero"><p>형강생산실 · AX SEMINAR</p><h1>모바일 심사실</h1><p>2026년 10월 16일 08:30 · 4.01 회의실</p></div>""",unsafe_allow_html=True)
 try:
@@ -39,11 +39,11 @@ else:
  if st.session_state.auth is None:
   st.subheader('심사위원 입장')
   with st.form('login'):
-   name=st.text_input('성명',max_chars=30);code=st.text_input('개별 접속코드',type='password');ok=st.form_submit_button('채점 시작',type='primary')
+   name=st.selectbox('성명',list(JUDGE_NAMES.values()),index=None,placeholder='실장님·팀장님 성명을 선택하세요');code=st.text_input('개별 접속코드',type='password');ok=st.form_submit_button('채점 시작',type='primary')
   st.caption('성명·소속·평가 점수는 행사 심사 및 집계를 위해 비공개 저장소에 보관됩니다.')
   if ok:
    judge=next((j for j in judges if hmac.compare_digest(code.strip(),j['code'])),None)
-   if not name.strip() or judge is None:st.error('성명과 접속코드를 확인하세요.')
+   if not name or judge is None or JUDGE_NAMES[judge['role']]!=name:st.error('선택한 성명과 개별 접속코드가 일치하는지 확인하세요.')
    else:st.session_state.auth={'judge':judge,'name':name.strip()};st.rerun()
   st.stop()
  auth=st.session_state.auth;judge=auth['judge'];st.write('**'+auth['name']+' · '+judge['role']+'**')
