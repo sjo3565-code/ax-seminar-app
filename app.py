@@ -2,7 +2,120 @@ import streamlit as st
 import hmac,html
 from core import Store,TEAMS,PEOPLE,CRITERIA,export_csv,JUDGE_NAMES
 st.set_page_config(page_title='형강생산실 AX 세미나',page_icon='📋',layout='centered')
-st.markdown("""<style>.stApp{background:#f2f5fa}.block-container{max-width:740px;padding-top:2rem} .hero{background:linear-gradient(120deg,#082b54,#655f9c 65%,#278a88);padding:26px;border-radius:20px;color:white;margin-bottom:20px}.hero h1{color:white;font-size:30px}.hero p{color:#d7eee9}.stButton button[kind=primary]{background:#167d76;border:0}div[data-testid=stMetric]{background:linear-gradient(135deg,#eef3fc,#e8f5ef);padding:16px;border-radius:12px}</style><div class="hero"><p>형강생산실 · AX SEMINAR</p><h1>모바일 심사실</h1><p>2026년 10월 16일 08:30 · 4.01 회의실</p></div>""",unsafe_allow_html=True)
+st.markdown("""<style>.stApp{background:#f2f5fa}.block-container{max-width:740px;padding-top:2rem} .hero{background:linear-gradient(120deg,#082b54,#655f9c 65%,#278a88);padding:26px;border-radius:20px;color:white;margin-bottom:20px}.hero h1{color:white;font-size:30px}.hero p{color:#d7eee9}.stButton button[kind=primary]{background:#167d76;border:0}div[data-testid=stMetric]{background:linear-gradient(135deg,#eef3fc,#e8f5ef);padding:16px;border-radius:12px}/* ===== Kakao In-App Browser Fix ===== */
+
+/* 강제 Light Mode */
+:root {
+    color-scheme: light !important;
+}
+
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+.main {
+    background: #f2f5fa !important;
+    color: #173452 !important;
+    -webkit-text-fill-color: #173452 !important;
+}
+
+/* 모든 텍스트 강제 */
+p,
+span,
+div,
+label,
+strong,
+small,
+li,
+a,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #173452 !important;
+    -webkit-text-fill-color: #173452 !important;
+}
+
+/* Hero 영역 제외 */
+.hero,
+.hero *,
+.hero h1,
+.hero p {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* 입력창 */
+input,
+textarea,
+select {
+    background: #ffffff !important;
+    color: #173452 !important;
+    -webkit-text-fill-color: #173452 !important;
+    border: 1px solid #8093a8 !important;
+}
+
+/* placeholder */
+input::placeholder,
+textarea::placeholder {
+    color: #6b7c8d !important;
+    -webkit-text-fill-color: #6b7c8d !important;
+    opacity: 1 !important;
+}
+
+/* Streamlit SelectBox */
+[data-baseweb="select"],
+[data-baseweb="select"] * {
+    color: #173452 !important;
+    -webkit-text-fill-color: #173452 !important;
+    background: #ffffff !important;
+}
+
+/* 숫자 입력 */
+[data-testid="stNumberInput"] input {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+/* 버튼 */
+button {
+    color: #173452 !important;
+    -webkit-text-fill-color: #173452 !important;
+}
+
+button[kind="primary"],
+button[data-testid="stBaseButton-primary"] {
+    background: #0f6d65 !important;
+    border-color: #0f6d65 !important;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
+
+/* 드롭다운 펼쳤을 때 */
+[role="listbox"],
+[role="option"] {
+    background: #ffffff !important;
+    color: #173452 !important;
+}
+
+/* Metric */
+[data-testid="stMetric"] {
+    background: #eef4fa !important;
+    color: #173452 !important;
+}
+
+/* Alert */
+[data-testid="stAlert"] {
+    background: #eef7f7 !important;
+}
+
+/* 카카오 브라우저 다크모드 강제 방지 */
+* {
+    forced-color-adjust: none !important;
+}</style><div class="hero"><p>형강생산실 · AX SEMINAR</p><h1>모바일 심사실</h1><p>2026년 10월 16일 08:30 · 4.01 회의실</p></div>""",unsafe_allow_html=True)
 try:
  cfg=dict(st.secrets);judges=[dict(j) for j in cfg['judges']];store=Store(cfg)
  if len(judges)!=6 or len({j['id'] for j in judges})!=6 or len({j['code'] for j in judges})!=6 or sorted(j['role'] for j in judges)!=sorted(['실장']+TEAMS):raise ValueError('심사위원 설정 오류')
